@@ -1,0 +1,9 @@
+train: Scanning /mnt/liujiaren/data/bus/labels/train/20240613_pingshan... 1251 images, 1 backgrounds, 7 corrupt: 100%|██████████| 1251/1251 [00:05<00:00, 220.08it/s]
+train: WARNING ⚠️ /mnt/liujiaren/data/bus/images/train/20240613_pingshan/20240605152355_965366_0_0.000000_0.000000_0.000000_2112.jpg: ignoring corrupt image/label: negative label values [-4.4409e-17]
+train: WARNING ⚠️ /mnt/liujiaren/data/bus/images/train/20240613_pingshan/20240605152524_1054766_0_0.000000_0.000000_0.000000_2539.jpg: ignoring corrupt image/label: negative label values [-1.9259e-35]
+train: WARNING ⚠️ /mnt/liujiaren/data/bus/images/train/20240613_pingshan/20240605152542_1072366_0_0.000000_0.000000_0.000000_2695.jpg: ignoring corrupt image/label: setting an array element with a sequence. The requested array has an inhomogeneous shape after 1 dimensions. The detected shape was (3,) + inhomogeneous part.
+train: WARNING ⚠️ /mnt/liujiaren/data/bus/images/train/20240613_pingshan/20240605152958_1328432_0_0.000000_0.000000_0.000000_3494.jpg: ignoring corrupt image/label: negative label values [-8.8818e-17]
+train: WARNING ⚠️ /mnt/liujiaren/data/bus/images/train/20240613_pingshan/20240605153705_1755633_0_0.000000_0.000000_0.000000_4615.jpg: ignoring corrupt image/label: negative label values [-8.8818e-17]
+train: WARNING ⚠️ /mnt/liujiaren/data/bus/images/train/20240613_pingshan/20240605154135_2025266_0_0.000000_0.000000_0.000000_5387.jpg: ignoring corrupt image/label: negative label values [-8.8818e-17]
+train: WARNING ⚠️ /mnt/liujiaren/data/bus/images/train/20240613_pingshan/20240605154601_2291833_0_0.000000_0.000000_0.000000_5887.jpg: ignoring corrupt image/label: negative label values [-8.8818e-17]
+train: New cache created: /mnt/liujiaren/data/bus/labels/train/20240613_pingshan.cache
