@@ -7,7 +7,7 @@ def main():
     #model = YOLO('yolov8n-obb.yaml').load('yolov8n.pt')  # build from YAML and transfer weights
 
     # Train the model
-    results = model.train(data='bus-pose.yaml', epochs=200, imgsz=640, batch=16, workers=1, save_period=10, amp=False)
+    results = model.train(data='bus-pose.yaml', epochs=200, imgsz=640, batch=32, workers=1, save_period=10, amp=True, project='runs/pose')
 
 
 if __name__ == '__main__':

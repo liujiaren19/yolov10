@@ -17,6 +17,10 @@ class_mapping = {
   12: "wheer_bar"      
 }
 
+def clip(src, image_weight=1920, image_height=1300):
+    dst = [min(max(src[0], 0), image_weight), min(max(src[1], 0), image_height)]
+    return dst
+
 def yolo_to_labelme_format(yolo_file, image_width=1920, image_height=1300):
     with open(yolo_file, 'r') as f:
         yolo_labels = f.readlines()
@@ -141,16 +145,16 @@ def convert_yolo_to_labelme(yolo_file, labelme_file, image_width, image_height, 
         width = float(parts[3]) * image_width
         height = float(parts[4]) * image_height
 
+        # 强制将坐标值限制在0到1之间
+        x_center = min(max(x_center, 0), image_width)
+        y_center = min(max(y_center, 0), image_height)
+        width = min(max(width, 0), image_width)
+        height = min(max(height, 0), image_height)        
+
         xmin = x_center - width / 2
         ymin = y_center - height / 2
         xmax = x_center + width / 2
         ymax = y_center + height / 2
-
-        # 强制将坐标值限制在0到1之间
-        x_center = min(max(x_center, 0), 1)
-        y_center = min(max(y_center, 0), 1)
-        width = min(max(width, 0), 1)
-        height = min(max(height, 0), 1)
 
         shape = {
             "label": class_mapping[class_id],
@@ -191,31 +195,23 @@ def convert_yolo_to_labelme_by_keypoints(yolo_file, labelme_file, image_width, i
         y_center = float(parts[2]) * image_height
         width = float(parts[3]) * image_width
         height = float(parts[4]) * image_height
+        
         kp0 = [float(parts[5]) * image_width, float(parts[6]) * image_height]
         kp1 = [float(parts[7]) * image_width, float(parts[8]) * image_height]
         kp2 = [float(parts[9]) * image_width, float(parts[10]) * image_height]
         kp3 = [float(parts[11]) * image_width, float(parts[12]) * image_height]
 
-        xmin = x_center - width / 2
-        ymin = y_center - height / 2
-        xmax = x_center + width / 2
-        ymax = y_center + height / 2
-
-        # 强制将坐标值限制在0到1之间
-        x_center = min(max(x_center, 0), 1)
-        y_center = min(max(y_center, 0), 1)
-        width = min(max(width, 0), 1)
-        height = min(max(height, 0), 1)
-
         shape = {
             "label": class_mapping[class_id],
             "points": [
-                [xmin, ymin],
-                [xmax, ymax]
+                clip(kp0, image_width, image_height),
+                clip(kp1, image_width, image_height),
+                clip(kp2, image_width, image_height),
+                clip(kp3, image_width, image_height)
             ],
             "group_id": None,
             "description": None,
-            "shape_type": "rectangle",
+            "shape_type": "polygon",
             "flags": {}
         }
         shapes.append(shape)
@@ -235,35 +231,36 @@ def convert_yolo_to_labelme_by_keypoints(yolo_file, labelme_file, image_width, i
         
 
 def convert_main(yolo_dir, labelme_dir, image_width=1920, image_height=1300):
-    if not os.path.exists(labelme_dir):
-        os.makedirs(labelme_dir)
 
-    for subdir in os.listdir(yolo_dir):
-        yolo_subdir = os.path.join(yolo_dir, subdir)
-        labelme_subdir = os.path.join(labelme_dir, subdir)
-        
-        if os.path.isdir(yolo_subdir):
-            if not os.path.exists(labelme_subdir):
-                os.makedirs(labelme_subdir)
+    for filename in os.listdir(yolo_dir):
+        if filename.endswith('.txt'):
+            yolo_file = os.path.join(yolo_dir, filename)
+            image_filename = filename.replace('.txt', '.jpg')  # 假设图像文件扩展名为.jpg
+            image_path = os.path.join(labelme_dir, image_filename)
+            
+            # # 假设你知道图像的宽度和高度
+            # image_width = 1920
+            # image_height = 1300
 
-            for filename in os.listdir(yolo_subdir):
-                if filename.endswith('.txt'):
-                    yolo_file = os.path.join(yolo_subdir, filename)
-                    image_filename = filename.replace('.txt', '.jpg')  # 假设图像文件扩展名为.jpg
-                    image_path = os.path.join(labelme_subdir, image_filename)
-                    
-                    # # 假设你知道图像的宽度和高度
-                    # image_width = 1920
-                    # image_height = 1300
-
-                    labelme_file = os.path.join(labelme_subdir, filename.replace('.txt', '.json'))
-                    convert_yolo_to_labelme(yolo_file, labelme_file, image_width, image_height, image_filename)
+            labelme_file = os.path.join(labelme_dir, filename.replace('.txt', '.json'))
+            # convert_yolo_to_labelme(yolo_file, labelme_file, image_width, image_height, image_filename)
+            convert_yolo_to_labelme_by_keypoints(yolo_file, labelme_file, image_width, image_height, image_filename)
 
     print("转换完成！")        
 
 if __name__ == "__main__":
-    yolo_dir = "/mnt/hgfs/HDD/BYD/data/labelme/predict3/labels"
-    labelme_dir = "/mnt/hgfs/HDD/BYD/data/labelme/未标"
+    yolo_dir = "runs/pose/待预标注"
+    labelme_dir = '/home/user/work/data/bus_data/B12E03数据集/已预标注数据_JSON'
     # merge_yolo_into_labelme(yolo_dir, labelme_dir)
-    convert_main(yolo_dir, labelme_dir, 640, 640)
+    # os.makedirs(labelme_dir, exist_ok=True)
+        
+    # convert_main(yolo_dir, labelme_dir, 640, 640)
+
+    for subdir in os.listdir(yolo_dir):
+        yolo_subdir = os.path.join(yolo_dir, subdir, 'labels')
+        labelme_subdir = os.path.join(labelme_dir, subdir)
+        
+        if os.path.isdir(yolo_subdir):
+            os.makedirs(labelme_subdir, exist_ok=True)  
+            convert_main(yolo_subdir, labelme_subdir, 640, 640)
 
